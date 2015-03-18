@@ -60,7 +60,8 @@ class LiverpoolCCScraper(Scraper):
                 "notes": unicode(description),
                 "owner_org": self.publisher,
                 "resources": [],
-                "tags": [{"name": "spending"}]
+                "tags": [{"name": "spending"}],
+                "license_id": "uk-ogl"
             }
             for l in links:
                 href = l.get('href')
@@ -77,10 +78,11 @@ class LiverpoolCCScraper(Scraper):
             try:
                 pkg = self.ckan.action.package_show(id=dataset['name'])
                 pkg['tags'] = dataset['tags']
+                pkg['notes'] = dataset['notes']
+                pkg['license_id'] = dataset['license_id']
                 pkg = self.ckan.action.package_update(**pkg)
             except Exception, e:
-                print e
-                #pkg = self.ckan.action.package_create(**dataset)
+                pkg = self.ckan.action.package_create(**dataset)
 
 
 
