@@ -18,11 +18,13 @@ class LiverpoolPlugin(plugins.SingletonPlugin):
             "title": toolkit._('Google Doc View'),
             "icon": "compass",
             "always_available": True,
+            "iframed": False,
         }
 
     def setup_template_variables(self, context, data_dict):
+        print data_dict["resource"]['url']
         return {
-            "url": data_dict["resource"]["url"]
+            "resource_url": data_dict["resource"]["url"]
         }
 
     def can_view(self, data_dict):
