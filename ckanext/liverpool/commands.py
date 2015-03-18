@@ -78,8 +78,9 @@ class LiverpoolCCScraper(Scraper):
                 pkg = self.ckan.action.package_show(id=dataset['id'])
                 pkg['tags'] = dataset['tags']
                 pkg = self.ckan.action.package_update(**pkg)
-            except:
-                pkg = self.ckan.action.package_create(**dataset)
+            except Exception, e:
+                print e
+                #pkg = self.ckan.action.package_create(**dataset)
 
 
 
