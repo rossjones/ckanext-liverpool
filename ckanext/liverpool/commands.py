@@ -53,7 +53,6 @@ class LiverpoolCCScraper(Scraper):
             links = h3.getnext().cssselect('li a')
 
             paras = dom.cssselect('.bodyContent p')[:10]
-            print paras
             description = "\n\n".join(p.text_content().strip() for p in paras)
             dataset = {
                 "title": u"Payments of invoices to vendors over £500 - {}".format(label),
