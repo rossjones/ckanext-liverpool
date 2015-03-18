@@ -83,6 +83,7 @@ setup(
     entry_points='''
         [ckan.plugins]
         liverpool=ckanext.liverpool.plugin:LiverpoolPlugin
+        gdoc_view=ckanext.liverpool.plugin:LiverpoolPlugin
 
         [paste.paster_command]
         scrape=ckanext.liverpool.commands:ScrapeCommand
