@@ -75,7 +75,7 @@ class LiverpoolCCScraper(Scraper):
 
             dataset["name"] = u"lcc-{}".format(slugify.slugify(dataset["title"]).lower())
             try:
-                pkg = self.ckan.action.package_show(id=dataset['id'])
+                pkg = self.ckan.action.package_show(id=dataset['name'])
                 pkg['tags'] = dataset['tags']
                 pkg = self.ckan.action.package_update(**pkg)
             except Exception, e:
