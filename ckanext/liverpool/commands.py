@@ -60,6 +60,7 @@ class LiverpoolCCScraper(Scraper):
                 "notes": unicode(description),
                 "owner_org": self.publisher,
                 "resources": [],
+                "tags": [{"name": "spending"}]
             }
             for l in links:
                 href = l.get('href')
@@ -75,6 +76,8 @@ class LiverpoolCCScraper(Scraper):
             dataset["name"] = u"lcc-{}".format(slugify.slugify(dataset["title"]).lower())
             try:
                 pkg = self.ckan.action.package_show(id=dataset['id'])
+                pkg['tags'] = dataset['tags']
+                pkg = self.ckan.action.package_update(**pkg)
             except:
                 pkg = self.ckan.action.package_create(**dataset)
 
