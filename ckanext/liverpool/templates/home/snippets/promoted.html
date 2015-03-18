@@ -1,5 +1,21 @@
-{% block home_image_content %}
-    <a class="media-image" href="#">
+{% set intro = g.site_intro_text %}
+
+<div class="module-content box">
+  <header>
+    {% if intro %}
+      {{ h.render_markdown(intro) }}
+    {% endif %}
+  </header>
+
+  {% block home_image %}
+    <section class="featured media-overlay hidden-phone">
+      <h2 class="media-heading">{% block home_image_caption %}{{ _("Liverpool's first public library") }}{% endblock %}</h2>
+      {% block home_image_content %}
+        <a class="media-image" href="#">
       <img src="/img/library.jpg" alt="Liverpool's first public library" width="420" height="220" />
-    </a>
-{% endblock %}
+        </a>
+      {% endblock %}
+    </section>
+  {% endblock %}
+</div>
+
