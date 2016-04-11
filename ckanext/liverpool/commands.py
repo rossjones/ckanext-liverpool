@@ -4,9 +4,11 @@ import logging
 import os
 import sys
 import requests
+from StringIO import StringIO
 
 import ckanapi
 from lxml.html import fromstring
+from lxml import etree
 
 from ckan.lib.cli import CkanCommand
 import slugify
@@ -30,13 +32,56 @@ class ScrapeCommand(CkanCommand):
         model.Session.configure(bind=model.meta.engine)
 
         print "Scraping!"
-        l = LiverpoolCCScraper()
-        l.scrape()
+        u = UKHOScraper()
+        u.scrape()
+
+        #l = LiverpoolCCScraper()
+        #l.scrape()
 
 class Scraper(object):
 
     def scrape(self):
         pass
+
+class UKHOScraper(Scraper):
+
+
+    def scrape(self):
+        ckan = ckanapi.RemoteCKAN("http://liverpool.servercode.co.uk", apikey="DERP")
+
+        for x in xrange(1, 21):
+            data = requests.get("http://data.gov.uk/feeds/custom.atom?q=liverpool&publisher=united-kingdom-hydrographic-office&page={}".format(x))
+            if not data.status_code == 200:
+                break
+            print "Got page ", x
+            doc = etree.parse(StringIO(data.content))
+
+            entries = doc.xpath('//a:entry',
+                    namespaces={'a': 'http://www.w3.org/2005/Atom'})
+            if len(entries) == 0:
+                break
+
+            for e in entries:
+                """
+                <entry xmlns="http://www.w3.org/2005/Atom">
+                    <title>Bathymetric Survey - 1998-08-19 - Liverpool Landing Stage</title>
+                    <link href="http://data.gov.uk/dataset/34b88c3e-8f6e-4acb-b709-e42b9129c25f" rel="alternate"/>
+                    <id>tag:data.gov.uk,2012:/dataset/34b88c3e-8f6e-4acb-b709-e42b9129c25f</id>
+                    <summary type="html">IPR Holder: Mersey Docks and Harbour Company; Purpose: Safety of navigation; IHO Sea: Irish Sea and the St. Georges Channel - 19; Survey Start: 1998-08-19; Survey End: 1998-08-19; Primary Instrument Type: Echosounder - single beam; Primary Navigation Type: Not Known;</summary><link length="24101" href="http://data.gov.uk/api/2/rest/package/bathymetric-survey-1998-08-19-liverpool-landing-stage" type="application/json" rel="enclosure"/><updated>2015-01-27T10:37:25Z</updated><published>2015-01-27T10:37:25Z</published></entry>
+                """
+                link = e.xpath("a:link", namespaces={'a': 'http://www.w3.org/2005/Atom'})
+                theid = link[0].get('href').split('/')[-1]
+                blob = requests.get('http://data.gov.uk/api/action/package_show?id={}'.format(theid)).json()['result']
+
+                dataset = {
+                    "name": blob["name"], "title": blob["title"], "notes": blob["notes"],
+                    "resources": blob["resources"], "owner_org": "united-kingdom-hydrographic-office"
+                }
+                ckan.action.package_create(**dataset)
+
+
+
+
 
 class LiverpoolCCScraper(Scraper):
 
